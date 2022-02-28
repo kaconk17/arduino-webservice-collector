@@ -1,0 +1,27 @@
+{
+  "name": "web_collector",
+  "version": "1.0.0",
+  "description": "web service for collect data from arduino",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaconk17/arduino-webservice-collector.git"
+  },
+  "keywords": [
+    "web",
+    "service",
+    "arduino"
+  ],
+  "author": "kaconk17",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kaconk17/arduino-webservice-collector/issues"
+  },
+  "homepage": "https://github.com/kaconk17/arduino-webservice-collector#readme",
+  "dependencies": {
+    "pg": "^8.7.3"
+  }
+}
