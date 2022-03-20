@@ -24,7 +24,7 @@ aedes.authenticate = (client, username, password, callback) => {
 
 // authorizing client to publish on a message topic
 aedes.authorizePublish = (client, packet, callback) => {
-  if (packet.topic === 'home/bedroom/fan') {
+  if (packet.topic === 'public/02') {
       return callback(null);
   }
   console.log('Error ! Unauthorized publish to a topic.')
@@ -55,6 +55,8 @@ aedes.on('unsubscribe', function (subscriptions, client) {
 aedes.on('publish', async function (packet, client) {
   if (client) {
       console.log(`[MESSAGE_PUBLISHED] Client ${(client ? client.id : 'BROKER_' + aedes.id)} has published message on ${packet.topic} to broker ${aedes.id}`)
+      var nn = packet.payload;
+      console.log(Buffer.from(nn, 'base64').toString());
   }
 })
 
