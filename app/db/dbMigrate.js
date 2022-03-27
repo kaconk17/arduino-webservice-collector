@@ -33,7 +33,7 @@ const dropListMeterTable = () =>{
 };
 
 const createLogTempTable = ()=>{
-    const logTempCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_temperature(id_record VARCHAR(50) NOT NULL PRIMARY KEY,id_device VARCHAR(50) REFERENCES tb_list_device(id_device) ON DELETE NO ACTION,tgl DATE NOT NULL,jam TIME NOT NULL,nilai DECIMAL(18,2),keterangan VARCHAR(100),created_at TIMESTAMP,updated_at TIMESTAMP)';
+    const logTempCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_temperature(id_record VARCHAR(50) NOT NULL PRIMARY KEY,id_device VARCHAR(50) REFERENCES tb_list_device(id_device) ON DELETE NO ACTION,tgl DATE NOT NULL,jam TIME NOT NULL,nilai DECIMAL(18,2),keterangan VARCHAR(100),created_at TIMESTAMP)';
 
     pool.query(logTempCreateQuery)
     .then((res)=>{

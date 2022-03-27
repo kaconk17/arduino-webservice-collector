@@ -1,10 +1,13 @@
 const aedes = require('aedes')()
 const server = require('net').createServer(aedes.handle)
 const port = 1883
-const mqtt = require('mqtt')
 require('dotenv').config();
 
 const broker_host = process.env.MQTT_SERVER;
+const user_name = process.env.MQTT_USER;
+const passwd = process.env.MQTT_PASSWORD;
+
+const {saveTemp, devUpd} = require('./app/controllers/dataController');
 
 server.listen(port, function () {
     console.log('server started and listening on port ', port)
@@ -13,8 +16,7 @@ server.listen(port, function () {
 // authenticate the connecting client
 aedes.authenticate = (client, username, password, callback) => {
   password = Buffer.from(password, 'base64').toString();
-  console.log(password);
-  if (username === 'user1' && password === 'password1') {
+  if (username === user_name && password === passwd) {
       return callback(null, true);
   }
   const error = new Error('Authentication Failed!! Invalid user credentials.');
@@ -24,20 +26,27 @@ aedes.authenticate = (client, username, password, callback) => {
 
 // authorizing client to publish on a message topic
 aedes.authorizePublish = (client, packet, callback) => {
-  if (packet.topic === 'public/02') {
-      return callback(null);
+  var topics =[
+    "CNC",
+    "UPS"
+  ];
+  if(topics.includes(packet.topic)){
+    console.log('Error ! Unauthorized publish to a topic.')
+    return callback(new Error('You are not authorized to publish on this message topic.'));
+   
   }
-  console.log('Error ! Unauthorized publish to a topic.')
-  return callback(new Error('You are not authorized to publish on this message topic.'));
+  return callback(null);
 }
 
 // emitted when a client connects to the broker
 aedes.on('client', function (client) {
+  devUpd(client.id,'ON');
   console.log(`[CLIENT_CONNECTED] Client ${(client ? client.id : client)} connected to broker ${aedes.id}`)
 })
 
 // emitted when a client disconnects from the broker
 aedes.on('clientDisconnect', function (client) {
+  devUpd(client.id,'OFF');
   console.log(`[CLIENT_DISCONNECTED] Client ${(client ? client.id : client)} disconnected from the broker ${aedes.id}`)
 })
 
@@ -54,27 +63,12 @@ aedes.on('unsubscribe', function (subscriptions, client) {
 // emitted when a client publishes a message packet on the topic
 aedes.on('publish', async function (packet, client) {
   if (client) {
+    if (packet.topic.includes('temp')) {
+      var tempVal = Buffer.from(packet.payload,'base64').toString();
+      saveTemp(client.id,tempVal,null);
+      console.log(tempVal);
+    }
       console.log(`[MESSAGE_PUBLISHED] Client ${(client ? client.id : 'BROKER_' + aedes.id)} has published message on ${packet.topic} to broker ${aedes.id}`)
-      var nn = packet.payload;
-      console.log(Buffer.from(nn, 'base64').toString());
+      
   }
 })
-
-/*
-
-const client  = mqtt.connect({ port: 1883, host: broker_host, keepalive: 10000})
-client.on('connect', function () {
-  client.subscribe('presence', function (err) {
-    if (!err) {
-      client.publish('presence', 'Hello mqtt')
-    }
-  })
-})
-
-client.on('message', function (topic, message) {
-  // message is Buffer
-  console.log(topic.toString())
-  console.log(message.toString())
-  client.end()
-})
-*/
