@@ -1,0 +1,9 @@
+version: '3.7'
+services:
+  aedes:
+    service_name: "aedes_mqtt"
+    build:
+      context: .
+    ports:
+      - '1882:1883'
+    restart: always
