@@ -1,13 +1,13 @@
 const aedes = require('aedes')()
 const server = require('net').createServer(aedes.handle)
-const port = 1883
 require('dotenv').config();
 
+const port = process.env.MQTT_PORT;
 const broker_host = process.env.MQTT_SERVER;
 const user_name = process.env.MQTT_USER;
 const passwd = process.env.MQTT_PASSWORD;
 
-const {saveTemp, devUpd} = require('./app/controllers/dataController');
+const {saveTemp, devUpd, checkDev} = require('./app/controllers/dataController');
 
 server.listen(port, function () {
     console.log('server started and listening on port ', port)
@@ -27,15 +27,16 @@ aedes.authenticate = (client, username, password, callback) => {
 // authorizing client to publish on a message topic
 aedes.authorizePublish = (client, packet, callback) => {
   var topics =[
-    "CNC",
-    "UPS"
+    "temp",
+    "power"
   ];
-  if(topics.includes(packet.topic)){
-    console.log('Error ! Unauthorized publish to a topic.')
-    return callback(new Error('You are not authorized to publish on this message topic.'));
-   
+  var intopic = packet.topic.split("/");
+  if(topics.includes(intopic[0])){
+    
+    return callback(null);
   }
-  return callback(null);
+  console.log('Error ! Unauthorized publish to a topic.')
+  return callback(new Error('You are not authorized to publish on this message topic.'));
 }
 
 // emitted when a client connects to the broker
@@ -66,7 +67,6 @@ aedes.on('publish', async function (packet, client) {
     if (packet.topic.includes('temp')) {
       var tempVal = Buffer.from(packet.payload,'base64').toString();
       saveTemp(client.id,tempVal,null);
-      console.log(tempVal);
     }
       console.log(`[MESSAGE_PUBLISHED] Client ${(client ? client.id : 'BROKER_' + aedes.id)} has published message on ${packet.topic} to broker ${aedes.id}`)
       
