@@ -66,7 +66,7 @@ aedes.on('publish', async function (packet, client) {
   if (client) {
     if (packet.topic.includes('temp')) {
       var tempVal = Buffer.from(packet.payload,'base64').toString();
-      saveTemp(client.id,tempVal,null);
+      saveTemp(client.id,tempVal);
     }
       console.log(`[MESSAGE_PUBLISHED] Client ${(client ? client.id : 'BROKER_' + aedes.id)} has published message on ${packet.topic} to broker ${aedes.id}`)
       

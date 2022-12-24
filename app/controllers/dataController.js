@@ -2,21 +2,15 @@ const moment = require('moment');
 const {pool} = require('../config/connection');
 const { v4:uuidv4} = require('uuid');
 
-const saveTemp = async (devid,data,ket) => {
-    const saveQuery = 'INSERT INTO tb_temperature VALUES($1,$2,$3,$4,$5,$6,$7)';
-    const id = uuidv4();
+const saveTemp = async (devid,data) => {
+    const saveQuery = 'INSERT INTO tb_temperature VALUES($1,$2,$3)';
+    
     const now = moment().format();
-    const tgl = moment().format('YYYY-MM-DD');
-    const jam = moment().format('HH:mm:ss');
 
     const values = [
-      id,
+      now,
       devid,
-      tgl,
-      jam,
-      data,
-      ket,
-      now
+      data
     ];
     var device = await checkDev(devid);
     if (device > 0) {
