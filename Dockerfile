@@ -1,7 +1,6 @@
-FROM node:16
-WORKDIR /usr/src/app
-COPY package*.json ./
+FROM node:lts-slim
+WORKDIR /app
+COPY . /app
 RUN npm install
-COPY . .
 EXPOSE 1883
-CMD [ "node", "index.js" ]
+CMD node index.js

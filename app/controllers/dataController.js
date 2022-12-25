@@ -27,6 +27,35 @@ const saveTemp = async (devid,data) => {
     }
 };
 
+const savePower = async (devid,data) => {
+  const saveQuery = 'INSERT INTO tb_logpower VALUES($1,$2,$3,$4,$5,$6,$7)';
+  
+  const now = moment().format();
+
+  const values = [
+    now,
+    devid,
+    data.volt,
+    data.ampere,
+    data.watt,
+    data.kwh,
+    data.freq
+  ];
+  var device = await checkDev(devid);
+  if (device > 0) {
+    
+    try {
+      const {rows} =  pool.query(saveQuery, values);
+      return true;
+    } catch (error) {
+      console.error("gagal insert", error);
+      return false;
+    }
+  }else{
+    return false;
+  }
+};
+
 const checkDev = async (devid) => {
   const checkQuery = "SELECT id_device FROM tb_list_device WHERE id_device = $1";
  
@@ -56,6 +85,7 @@ const devUpd = (devid, state) => {
 
 module.exports = {
   saveTemp,
+  savePower,
   devUpd,
   checkDev,
 };

@@ -5,10 +5,10 @@ pool.on('connect',()=>{
     console.log('berhasil koneksi ke DB');
 });
 
-const createListMeterTable = ()=>{
-    const listMeterCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_list_device(id_device VARCHAR(50) NOT NULL PRIMARY KEY,address VARCHAR(100) UNIQUE NOT NULL,nama VARCHAR(100) NOT NULL,jenis VARCHAR(100) NOT NULL,setatus VARCHAR(10) NOT NULL,lokasi VARCHAR(100),keterangan VARCHAR(100),created_at TIMESTAMP,updated_at TIMESTAMP)';
+const createListMeterTable = async ()=>{
+    const listMeterCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_list_device(id_device TEXT NOT NULL PRIMARY KEY,address VARCHAR(100) UNIQUE NOT NULL,nama VARCHAR(100) NOT NULL,jenis VARCHAR(100) NOT NULL,setatus VARCHAR(10) NOT NULL,lokasi VARCHAR(100),keterangan VARCHAR(100),created_at TIMESTAMP,updated_at TIMESTAMP)';
 
-    pool.query(listMeterCreateQuery)
+    await pool.query(listMeterCreateQuery)
     .then((res)=>{
         console.log(res);
         pool.end();
@@ -19,9 +19,9 @@ const createListMeterTable = ()=>{
     });
 };
 
-const dropListMeterTable = () =>{
+const dropListMeterTable = async () =>{
     const listMeterDropQuery = 'DROP TABLE IF EXISTS tb_list_device';
-    pool.query(listMeterDropQuery)
+    await pool.query(listMeterDropQuery)
     .then((res)=>{
         console.log(res);
         pool.end();
@@ -32,10 +32,10 @@ const dropListMeterTable = () =>{
     });
 };
 
-const createLogTempTable = ()=>{
-    const logTempCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_temperature(time TIMESTAMPTZ NOT NULL,id_device VARCHAR(50) ,nilai DECIMAL(18,2))';
+const createLogTempTable = async ()=>{
+    const logTempCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_temperature(time TIMESTAMPTZ NOT NULL,id_device TEXT NOT NULL ,nilai DECIMAL(18,2))';
 
-    pool.query(logTempCreateQuery)
+   await pool.query(logTempCreateQuery)
     .then((res)=>{
         console.log(res);
         pool.end();
@@ -46,10 +46,10 @@ const createLogTempTable = ()=>{
     });
 };
 
-const createLogPower = ()=>{
-    const logPowerCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_logpower(time TIMESTAMPTZ NOT NULL,id_device VARCHAR(50) ,volt DECIMAL(18,2), ampere DECIMAL(18,2), watt DECIMAL(18,2), kwh DECIMAL(18,2), freq DECIMAL(18,2))';
+const createLogPower = async ()=>{
+    const logPowerCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_logpower(time TIMESTAMPTZ NOT NULL,id_device TEXT NOT NULL,volt DECIMAL(18,2), ampere DECIMAL(18,2), watt DECIMAL(18,2), kwh DECIMAL(18,2), freq DECIMAL(18,2))';
 
-    pool.query(logPowerCreateQuery)
+  await pool.query(logPowerCreateQuery)
     .then((res)=>{
         console.log(res);
         pool.end();
@@ -74,7 +74,7 @@ const dropLogTempTable = () =>{
 };
 
 const dropLogPowerTable = () =>{
-    const logTempDropQuery = 'DROP TABLE IF EXISTS tb_logpower';
+    const logPowerDropQuery = 'DROP TABLE IF EXISTS tb_logpower';
     pool.query(logPowerDropQuery)
     .then((res)=>{
         console.log(res);

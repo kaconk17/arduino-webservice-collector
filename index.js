@@ -7,7 +7,7 @@ const broker_host = process.env.MQTT_SERVER;
 const user_name = process.env.MQTT_USER;
 const passwd = process.env.MQTT_PASSWORD;
 
-const {saveTemp, devUpd, checkDev} = require('./app/controllers/dataController');
+const {saveTemp, devUpd, checkDev, savePower} = require('./app/controllers/dataController');
 
 server.listen(port, function () {
     console.log('server started and listening on port ', port)
@@ -67,6 +67,10 @@ aedes.on('publish', async function (packet, client) {
     if (packet.topic.includes('temp')) {
       var tempVal = Buffer.from(packet.payload,'base64').toString();
       saveTemp(client.id,tempVal);
+    }
+    if (packet.topic.includes('power')) {
+      var jsonpayload = JSON.parse(Buffer.from(packet.payload,'base64'));
+      savePower(client.id,jsonpayload);
     }
       console.log(`[MESSAGE_PUBLISHED] Client ${(client ? client.id : 'BROKER_' + aedes.id)} has published message on ${packet.topic} to broker ${aedes.id}`)
       
