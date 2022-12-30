@@ -5,10 +5,10 @@ pool.on('connect',()=>{
     console.log('berhasil koneksi ke DB');
 });
 
-const createListMeterTable = ()=>{
-    const listMeterCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_list_device(id_device VARCHAR(50) NOT NULL PRIMARY KEY,address VARCHAR(100) UNIQUE NOT NULL,nama VARCHAR(100) NOT NULL,mac VARCHAR(100) NOT NULL,jenis VARCHAR(100) NOT NULL,setatus VARCHAR(10) NOT NULL,lokasi VARCHAR(100),keterangan VARCHAR(100),created_at TIMESTAMP,updated_at TIMESTAMP)';
+const createListMeterTable = async ()=>{
+    const listMeterCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_list_device(id_device TEXT NOT NULL PRIMARY KEY,address VARCHAR(100) UNIQUE NOT NULL,nama VARCHAR(100) NOT NULL,jenis VARCHAR(100) NOT NULL,setatus VARCHAR(10) NOT NULL,lokasi VARCHAR(100),keterangan VARCHAR(100),created_at TIMESTAMP,updated_at TIMESTAMP)';
 
-    pool.query(listMeterCreateQuery)
+    await pool.query(listMeterCreateQuery)
     .then((res)=>{
         console.log(res);
         pool.end();
@@ -19,9 +19,9 @@ const createListMeterTable = ()=>{
     });
 };
 
-const dropListMeterTable = () =>{
+const dropListMeterTable = async () =>{
     const listMeterDropQuery = 'DROP TABLE IF EXISTS tb_list_device';
-    pool.query(listMeterDropQuery)
+    await pool.query(listMeterDropQuery)
     .then((res)=>{
         console.log(res);
         pool.end();
@@ -32,10 +32,41 @@ const dropListMeterTable = () =>{
     });
 };
 
-const createLogTempTable = ()=>{
-    const logTempCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_temperature(id_record VARCHAR(50) NOT NULL PRIMARY KEY,id_device VARCHAR(50) REFERENCES tb_list_device(id_device) ON DELETE NO ACTION,tgl DATE NOT NULL,jam TIME NOT NULL,nilai DECIMAL(18,2),keterangan VARCHAR(100),created_at TIMESTAMP)';
+const createLogTempTable = async ()=>{
+    const logTempCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_temperature(time TIMESTAMPTZ NOT NULL,id_device TEXT NOT NULL ,nilai DECIMAL(18,2))';
 
-    pool.query(logTempCreateQuery)
+   await pool.query(logTempCreateQuery)
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
+
+const createHyperTable = async (tbName)=>{
+    const theQuery = "SELECT create_hypertable($1,'time');"
+    await pool.query(theQuery, [tbName])
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
+
+const createIndexTable = async ()=>{
+
+}
+
+const createLogPower = async ()=>{
+    const logPowerCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_logpower(time TIMESTAMPTZ NOT NULL,id_device TEXT NOT NULL,volt DECIMAL(18,2), ampere DECIMAL(18,2), watt DECIMAL(18,2), kwh DECIMAL(18,2), freq DECIMAL(18,2))';
+
+  await pool.query(logPowerCreateQuery)
     .then((res)=>{
         console.log(res);
         pool.end();
@@ -59,14 +90,64 @@ const dropLogTempTable = () =>{
     });
 };
 
+const dropLogPowerTable = () =>{
+    const logPowerDropQuery = 'DROP TABLE IF EXISTS tb_logpower';
+    pool.query(logPowerDropQuery)
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
+
+const indexTemptable = ()=>{
+    const theQuery = "CREATE INDEX tmp_id_time ON tb_temperature (id_device, time DESC);"
+    pool.query(theQuery)
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
+
+const indexPowertable = ()=>{
+    const theQuery = "CREATE INDEX pow_id_time ON tb_logpower (id_device, time DESC);"
+    pool.query(theQuery)
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
+
+
 const createAllTable = () => {
     createListMeterTable();
     createLogTempTable();
+    createLogPower();
 };
 
 const dropAllTable = ()=>{
     dropListMeterTable();
     dropLogTempTable();
+    dropLogPowerTable();
+};
+
+const createAllHyper = () =>{
+    createHyperTable("tb_temperature");
+    createHyperTable("tb_logpower");
+
+    indexTemptable();
+    indexPowertable();
 };
 
 pool.on('remove', ()=>{
@@ -77,6 +158,7 @@ pool.on('remove', ()=>{
 module.exports = {
     createAllTable,
     dropAllTable,
+    createAllHyper,
 };
 
 require('make-runnable');

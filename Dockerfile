@@ -1,7 +1,8 @@
-FROM node:16
-WORKDIR /usr/src/app
-COPY package*.json ./
+FROM node:lts-alpine3.17
+WORKDIR /app
+COPY . /app
 RUN npm install
-COPY . .
+RUN chown -R node:node /app
+USER node
 EXPOSE 1883
-CMD [ "node", "index.js" ]
+CMD node index.js
