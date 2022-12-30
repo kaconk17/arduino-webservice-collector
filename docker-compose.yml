@@ -7,9 +7,11 @@ services:
     ports:
       - '1882:1883'
     restart: always
-    environment:
-      - ABASE_URL=${ABASE_URL}
-      - T_SERVER = ${T_SERVER}
-      - T_PORT = ${T_PORT}
-      - T_USER = ${T_USER}
-      - T_PASSWORD = ${T_PASSWORD}
+    env_file:
+      - ./.env
+   # environment:
+    #  - ABASE_URL=${ABASE_URL}
+     # - T_SERVER = ${T_SERVER}
+     # - T_PORT = ${T_PORT}
+     # - T_USER = ${T_USER}
+     # - T_PASSWORD = ${T_PASSWORD}
