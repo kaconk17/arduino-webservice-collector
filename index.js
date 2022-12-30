@@ -41,3 +41,6 @@ client.on("message",function(topic,message,packet){
 client.subscribe("temp/#",{qos:1});
 client.subscribe("power/#",{qos:1});
 
+client.on("error",function(error){
+console.log("Can't connect" + error);
+process.exit(1)});
