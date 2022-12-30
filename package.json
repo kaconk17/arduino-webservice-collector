@@ -4,7 +4,7 @@
   "description": "web service for collect data from arduino",
   "main": "index.js",
   "scripts": {
-    "start":"node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate-table": "node ./app/db/dbMigrate createAllTable"
   },
@@ -24,11 +24,10 @@
   },
   "homepage": "https://github.com/kaconk17/arduino-webservice-collector#readme",
   "dependencies": {
-    "aedes": "^0.46.3",
     "dotenv": "^16.0.0",
     "make-runnable": "^1.3.10",
     "moment": "^2.29.1",
-    "pg": "^8.7.3",
-    "uuid": "^8.3.2"
+    "mqtt": "^4.3.7",
+    "pg": "^8.7.3"
   }
 }
