@@ -1,6 +1,6 @@
 const moment = require('moment');
 const {pool} = require('../config/connection');
-const { v4:uuidv4} = require('uuid');
+
 
 const saveTemp = async (devid,data) => {
     const saveQuery = 'INSERT INTO tb_temperature VALUES($1,$2,$3)';
