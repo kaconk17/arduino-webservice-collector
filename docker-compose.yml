@@ -3,8 +3,6 @@ services:
   mqtt_client:
     build:
       context: .
-    ports:
-      - '1882:1883'
     restart: always
     env_file:
       - ./.env
