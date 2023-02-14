@@ -59,9 +59,44 @@ const createHyperTable = async (tbName)=>{
     });
 };
 
-const createIndexTable = async ()=>{
+const createContinuousTemp = async ()=>{
+    const theQuery = "CREATE MATERIALIZED VIEW temp_daily WITH (timescaledb.continuous) AS SELECT time_bucket('1 day', \"time\") AS day, id_device, max(nilai) AS high, min(nilai) AS low, avg(nilai) AS average FROM tb_temperature GROUP BY day, id_device;"
+    await pool.query(theQuery)
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
 
-}
+const createRefreshTemp = async ()=>{
+    const theQuery = "SELECT add_continuous_aggregate_policy('temp_daily', start_offset => INTERVAL '3 days',end_offset => INTERVAL '1 hour', schedule_interval => INTERVAL '1 days');"
+    await pool.query(theQuery)
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
+
+const createRetentionPolicy = async (tbName)=>{
+    const theQuery = "SELECT add_retention_policy($1, INTERVAL '6 month');"
+    await pool.query(theQuery, [tbName])
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
 
 const createLogPower = async ()=>{
     const logPowerCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_logpower(time TIMESTAMPTZ NOT NULL,id_device TEXT NOT NULL,volt DECIMAL(18,2), ampere DECIMAL(18,2), watt DECIMAL(18,2), kwh DECIMAL(18,2), freq DECIMAL(18,2))';
@@ -150,6 +185,19 @@ const createAllHyper = () =>{
     indexPowertable();
 };
 
+const createContinuousAggregate = () =>{
+    createContinuousTemp();
+};
+
+const createrefreshPolicy = () =>{
+    createRefreshTemp();
+};
+
+const createAllretention = ()=>{
+    createRetentionPolicy("tb_temperature");
+    createRetentionPolicy("tb_logpower");
+};
+
 pool.on('remove', ()=>{
     console.log('client removed');
     process.exit(0);
@@ -159,6 +207,9 @@ module.exports = {
     createAllTable,
     dropAllTable,
     createAllHyper,
+    createContinuousAggregate,
+    createrefreshPolicy,
+    createAllretention,
 };
 
 require('make-runnable');
