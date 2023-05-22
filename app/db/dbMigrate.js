@@ -72,8 +72,34 @@ const createContinuousTemp = async ()=>{
     });
 };
 
+const createContinuousPower = async ()=>{
+    const theQuery = "CREATE MATERIALIZED VIEW power_daily WITH (timescaledb.continuous) AS SELECT time_bucket('1 day', \"time\") AS day, id_device, max(volt) AS v_high, min(volt) AS v_low, avg(volt) AS v_avg, max(ampere) AS a_high, min(ampere) AS a_low, avg(ampere) AS a_avg, max(watt) AS w_high, min(watt) AS w_low, avg(watt) AS w_avg, min(kwh) as kwh_min, max(kwh) as kwh_max FROM tb_logpower GROUP BY day, id_device;"
+    await pool.query(theQuery)
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
+
 const createRefreshTemp = async ()=>{
     const theQuery = "SELECT add_continuous_aggregate_policy('temp_daily', start_offset => INTERVAL '3 days',end_offset => INTERVAL '1 hour', schedule_interval => INTERVAL '1 days');"
+    await pool.query(theQuery)
+    .then((res)=>{
+        console.log(res);
+        pool.end();
+    })
+    .catch((err)=>{
+        console.log(err);
+        pool.end();
+    });
+};
+
+const createRefreshPower = async ()=>{
+    const theQuery = "SELECT add_continuous_aggregate_policy('power_daily', start_offset => INTERVAL '3 days',end_offset => INTERVAL '1 hour', schedule_interval => INTERVAL '1 days');"
     await pool.query(theQuery)
     .then((res)=>{
         console.log(res);
@@ -99,7 +125,7 @@ const createRetentionPolicy = async (tbName)=>{
 };
 
 const createLogPower = async ()=>{
-    const logPowerCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_logpower(time TIMESTAMPTZ NOT NULL,id_device TEXT NOT NULL,volt DECIMAL(18,2), ampere DECIMAL(18,2), watt DECIMAL(18,2), kwh DECIMAL(18,2), freq DECIMAL(18,2))';
+    const logPowerCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_logpower(time TIMESTAMPTZ NOT NULL,id_device TEXT NOT NULL,volt DECIMAL(18,2), ampere DECIMAL(18,2), watt DECIMAL(18,2), kwh DECIMAL(18,2), freq DECIMAL(18,2), pf DECIMAL(18,2))';
 
   await pool.query(logPowerCreateQuery)
     .then((res)=>{
@@ -187,10 +213,12 @@ const createAllHyper = () =>{
 
 const createContinuousAggregate = () =>{
     createContinuousTemp();
+    createContinuousPower();
 };
 
 const createrefreshPolicy = () =>{
     createRefreshTemp();
+    createRefreshPower();
 };
 
 const createAllretention = ()=>{
