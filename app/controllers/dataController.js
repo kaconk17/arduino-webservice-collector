@@ -28,18 +28,19 @@ const saveTemp = async (devid,data) => {
 };
 
 const savePower = async (devid,data) => {
-  const saveQuery = 'INSERT INTO tb_logpower VALUES($1,$2,$3,$4,$5,$6,$7)';
+  const saveQuery = 'INSERT INTO tb_logpower VALUES($1,$2,$3,$4,$5,$6,$7,$8)';
   
   const now = moment().format();
 
   const values = [
     now,
     devid,
-    data.volt,
-    data.ampere,
-    data.watt,
-    data.kwh,
-    data.freq
+    data.voltage,
+    data.current,
+    data.power,
+    data.energy,
+    data.freq,
+    data.pf
   ];
   var device = await checkDev(devid);
   if (device > 0) {

@@ -24,13 +24,14 @@ const {saveTemp, devUpd, checkDev, savePower} = require('./app/controllers/dataC
 
 client.on("message",function(topic,message,packet){
   var strtopic = topic.split("/");
-  var clientID = strtopic[1];
+
+  var clientID = strtopic[2];
   
   if (strtopic[0] == 'temp') {
     var tempVal = Buffer.from(message,'base64').toString();
     saveTemp(clientID,tempVal);
   }
-  if (strtopic[0] == 'power') {
+  if (strtopic[1] == 'power') {
     var jsonpayload = JSON.parse(message);
     //console.log(jsonpayload);
     savePower(clientID,jsonpayload);
@@ -38,8 +39,8 @@ client.on("message",function(topic,message,packet){
   
 
 });
-client.subscribe("temp/#",{qos:1});
-client.subscribe("power/#",{qos:1});
+client.subscribe("smarthome/temp/#",{qos:1});
+client.subscribe("smarthome/power/#",{qos:1});
 
 client.on("error",function(error){
 console.log("Can't connect" + error);

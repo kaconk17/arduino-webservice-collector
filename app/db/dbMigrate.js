@@ -125,7 +125,7 @@ const createRetentionPolicy = async (tbName)=>{
 };
 
 const createLogPower = async ()=>{
-    const logPowerCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_logpower(time TIMESTAMPTZ NOT NULL,id_device TEXT NOT NULL,volt DECIMAL(18,2), ampere DECIMAL(18,2), watt DECIMAL(18,2), kwh DECIMAL(18,2), freq DECIMAL(18,2), pf DECIMAL(18,2))';
+    const logPowerCreateQuery = 'CREATE TABLE IF NOT EXISTS tb_logpower(time TIMESTAMPTZ NOT NULL,id_device TEXT NOT NULL,volt DECIMAL(18,2), ampere DECIMAL(18,2), watt DECIMAL(18,2), kwh DECIMAL(18,3), freq DECIMAL(18,2), pf DECIMAL(18,2))';
 
   await pool.query(logPowerCreateQuery)
     .then((res)=>{
